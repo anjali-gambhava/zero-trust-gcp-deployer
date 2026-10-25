@@ -1,0 +1,7 @@
+.env*
+*.key
+*.pem
+*.json
+!package.json
+!tsconfig.json
+.gcloud/
