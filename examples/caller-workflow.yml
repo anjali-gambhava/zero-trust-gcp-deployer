@@ -1,0 +1,37 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Example Caller Workflow for Downstream Microservices
+# Place this in your microservice repo: .github/workflows/deploy.yml
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Production Deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  # Deploy backend service to Cloud Run with private VPC egress
+  deploy-api:
+    name: 🚀 Deploy Microservice
+    uses: anjali-gambhava/zero-trust-gcp-deployer/.github/workflows/deploy-engine.yml@main
+    with:
+      SERVICE_NAME: 'auth-service'
+      ENV_TAG: 'prod'
+      DEPLOY_TARGET: 'cloudrun' # Options: 'cloudrun' or 'vm'
+      AR_REPO: 'microservices'
+      REGION: 'us-central1'
+      MEMORY: '1Gi'
+      CPU: '1'
+      MIN_INSTANCES: '1'
+      MAX_INSTANCES: '10'
+      VPC_CONNECTOR: 'serverless-vpc-connector'
+      SECRETS_MAPPING: 'DB_PASSWORD=projects/123456789/secrets/db-pass:latest'
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      SERVICE_ENV: ${{ secrets.SERVICE_ENV }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
